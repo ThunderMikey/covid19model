@@ -69,12 +69,18 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install dependencies
+        run: |
+          apt install pdf2svg
+
       - name: Build website
         run: |
           docker run --rm -v $(pwd):/var/model harrisonzhu5080/covid19model:latest $(id -u) $(id -g)
           mkdir -p website_build
-          cp -r results website_build/
+          mkdir -p website_build/results
           cp -r website_template/* website_build/
+          for pdf in results/*.pdf; do pdf2svg $pdf ${pdf%.pdf}.svg; done
+          cp -t website_build/results results/{*.pdf,*.svg}
 
       - name: Deploy gh-pages
         uses: JamesIves/github-pages-deploy-action@releases/v3
