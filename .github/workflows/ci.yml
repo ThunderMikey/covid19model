@@ -74,18 +74,28 @@ jobs:
           sudo apt update
           sudo apt install pdf2svg
 
-      - name: Build website
+      - name: Generate results
         run: |
           docker run --rm -v $(pwd):/var/model harrisonzhu5080/covid19model:latest $(id -u) $(id -g)
-          mkdir -p website_build
-          mkdir -p website_build/results
-          cp -r website_template/* website_build/
+
+      - name: Copy over results
+        run: |
+          mkdir -p website_build/assets/results_pdf
+          cp -t website_build/assets/results_pdf results/*.pdf
+
+      - name: Convert PDF to SVGs
+        run: |
+          mkdir -p website_build/assets/results_svg
           for pdf in results/*.pdf; do pdf2svg $pdf ${pdf%.pdf}.svg; done
-          cp -t website_build/results results/{*.pdf,*.svg}
+          cp -t website_build/assets/results_svg results/*.svg
+
+      - name: Build website
+        run: |
+          docker run --rm -v $(pwd)/website_template:/srv/jekyll -it jekyll/jekyll:latest jekyll build
 
       - name: Deploy gh-pages
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: website_build
+          FOLDER: website_template/_site

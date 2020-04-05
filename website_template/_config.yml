@@ -1,0 +1,6 @@
+title: Results for modelling estimated deaths and cases fro COVID19
+defaults:
+  - scope:
+      path: "assets/results_svg"
+    values:
+      svg: true
