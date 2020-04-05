@@ -91,7 +91,7 @@ jobs:
 
       - name: Build website
         run: |
-          docker run --rm -i -v $(pwd)/website_template:/srv/jekyll -it jekyll/jekyll:latest jekyll build
+          docker run --rm -t -v $(pwd)/website_template:/srv/jekyll -it jekyll/jekyll:latest jekyll build
 
       - name: Deploy gh-pages
         uses: JamesIves/github-pages-deploy-action@releases/v3
