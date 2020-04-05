@@ -6,7 +6,7 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ master, website_trials ]
   pull_request:
     branches: [ master ]
 
@@ -60,3 +60,25 @@ jobs:
         conda run --name covid19model Rscript base.r base
       env:
         DEBUG: "TRUE"
+
+  build_and_deploy_gh_pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Build website
+        run: |
+          docker run --rm -v $(pwd):/var/model harrisonzhu5080/covid19model:latest $(id -u) $(id -g)
+          mkdir -p website_build
+          cp -r results website_build/
+          cp -r website_template/* website_build/
+
+      - name: Deploy gh-pages
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: website_build
