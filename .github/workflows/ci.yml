@@ -71,7 +71,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt install pdf2svg
+          sudo apt update
+          sudo apt install pdf2svg
 
       - name: Build website
         run: |
